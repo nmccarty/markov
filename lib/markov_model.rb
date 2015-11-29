@@ -32,4 +32,34 @@ class MarkovModel
     end
     nil
   end
+
+  def select(state)
+    hash = @model[state]
+    target = rand
+
+    total = hash.values.reduce(:+)
+    nexts = hash.keys.collect {|key| [hash[key].fdiv(total), key]}
+
+    i = 0
+    value = nil
+    total = 0
+    while total < target
+      (score, value) = nexts[i]
+      total += score
+      i += 1
+    end
+    value
+  end
+
+  def produce()
+    state = []
+    x = Array.new(@order, :start)
+        y = select(x)
+    while y != :end
+      state.push(y)
+      x = x[0...-1].push(y)
+      y = select(x)
+    end
+    state
+  end
 end
